@@ -43,7 +43,7 @@ struct Constants{
         static let radius = "5"
         static let responseFormat = "json"
         static let disableJsonCallback = "1"
-        static let pageLimit = "30"
+        static let pageLimit = "21"
     }
     
     

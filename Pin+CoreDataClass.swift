@@ -2,14 +2,14 @@
 //  Pin+CoreDataClass.swift
 //  VirtualTourist
 //
-//  Created by Richard H on 18/07/2017.
+//  Created by Richard H on 27/07/2017.
 //  Copyright © 2017 Richard H. All rights reserved.
 //
 
 import Foundation
 import CoreData
 
-@objc(Pin)
+
 public class Pin: NSManagedObject {
     convenience init(latitude: Double, longitude: Double, context: NSManagedObjectContext){
         

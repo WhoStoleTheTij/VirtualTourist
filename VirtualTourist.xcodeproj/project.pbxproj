@@ -7,15 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		4181CB9A1F1E831800A14465 /* Pin+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4181CB961F1E831800A14465 /* Pin+CoreDataClass.swift */; };
-		4181CB9B1F1E831800A14465 /* Pin+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4181CB971F1E831800A14465 /* Pin+CoreDataProperties.swift */; };
-		4181CB9C1F1E831800A14465 /* Photo+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4181CB981F1E831800A14465 /* Photo+CoreDataClass.swift */; };
-		4181CB9D1F1E831800A14465 /* Photo+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4181CB991F1E831800A14465 /* Photo+CoreDataProperties.swift */; };
+		4104FCD51F2A7B7A00655EFD /* Photo+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4104FCD11F2A7B7A00655EFD /* Photo+CoreDataClass.swift */; };
+		4104FCD61F2A7B7A00655EFD /* Photo+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4104FCD21F2A7B7A00655EFD /* Photo+CoreDataProperties.swift */; };
+		4104FCD71F2A7B7A00655EFD /* Pin+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4104FCD31F2A7B7A00655EFD /* Pin+CoreDataClass.swift */; };
+		4104FCD81F2A7B7A00655EFD /* Pin+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4104FCD41F2A7B7A00655EFD /* Pin+CoreDataProperties.swift */; };
 		41BBD85F1F17EE8D0025A568 /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 41BBD85D1F17EE8D0025A568 /* Model.xcdatamodeld */; };
 		41BBD8641F17F1650025A568 /* CoreDataHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41BBD8631F17F1650025A568 /* CoreDataHandler.swift */; };
 		41BBD8661F17F8690025A568 /* TravelsMapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41BBD8651F17F8690025A568 /* TravelsMapViewController.swift */; };
 		41BBD86A1F180B110025A568 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 41BBD8691F180B110025A568 /* MapKit.framework */; };
-		41D0B0E51F1A34DB0074608D /* CoreDataViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41D0B0E41F1A34DB0074608D /* CoreDataViewController.swift */; };
 		41D0B0F31F1A73960074608D /* PhotoAlbumViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41D0B0F21F1A73960074608D /* PhotoAlbumViewController.swift */; };
 		41D0B0F61F1A74120074608D /* ConnectionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41D0B0F51F1A74120074608D /* ConnectionHandler.swift */; };
 		41FB64ED1F16B050005EFC68 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41FB64EC1F16B050005EFC68 /* AppDelegate.swift */; };
@@ -28,15 +27,14 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		4181CB961F1E831800A14465 /* Pin+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Pin+CoreDataClass.swift"; sourceTree = "<group>"; };
-		4181CB971F1E831800A14465 /* Pin+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Pin+CoreDataProperties.swift"; sourceTree = "<group>"; };
-		4181CB981F1E831800A14465 /* Photo+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Photo+CoreDataClass.swift"; sourceTree = "<group>"; };
-		4181CB991F1E831800A14465 /* Photo+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Photo+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		4104FCD11F2A7B7A00655EFD /* Photo+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Photo+CoreDataClass.swift"; sourceTree = "<group>"; };
+		4104FCD21F2A7B7A00655EFD /* Photo+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Photo+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		4104FCD31F2A7B7A00655EFD /* Pin+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Pin+CoreDataClass.swift"; sourceTree = "<group>"; };
+		4104FCD41F2A7B7A00655EFD /* Pin+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Pin+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		41BBD85E1F17EE8D0025A568 /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
 		41BBD8631F17F1650025A568 /* CoreDataHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataHandler.swift; sourceTree = "<group>"; };
 		41BBD8651F17F8690025A568 /* TravelsMapViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TravelsMapViewController.swift; sourceTree = "<group>"; };
 		41BBD8691F180B110025A568 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
-		41D0B0E41F1A34DB0074608D /* CoreDataViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataViewController.swift; sourceTree = "<group>"; };
 		41D0B0F21F1A73960074608D /* PhotoAlbumViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotoAlbumViewController.swift; sourceTree = "<group>"; };
 		41D0B0F51F1A74120074608D /* ConnectionHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConnectionHandler.swift; sourceTree = "<group>"; };
 		41FB64E91F16B050005EFC68 /* VirtualTourist.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = VirtualTourist.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -78,7 +76,6 @@
 			isa = PBXGroup;
 			children = (
 				41BBD8651F17F8690025A568 /* TravelsMapViewController.swift */,
-				41D0B0E41F1A34DB0074608D /* CoreDataViewController.swift */,
 				41D0B0F21F1A73960074608D /* PhotoAlbumViewController.swift */,
 			);
 			name = ViewControllers;
@@ -106,10 +103,10 @@
 		41FB64E01F16B050005EFC68 = {
 			isa = PBXGroup;
 			children = (
-				4181CB961F1E831800A14465 /* Pin+CoreDataClass.swift */,
-				4181CB971F1E831800A14465 /* Pin+CoreDataProperties.swift */,
-				4181CB981F1E831800A14465 /* Photo+CoreDataClass.swift */,
-				4181CB991F1E831800A14465 /* Photo+CoreDataProperties.swift */,
+				4104FCD11F2A7B7A00655EFD /* Photo+CoreDataClass.swift */,
+				4104FCD21F2A7B7A00655EFD /* Photo+CoreDataProperties.swift */,
+				4104FCD31F2A7B7A00655EFD /* Pin+CoreDataClass.swift */,
+				4104FCD41F2A7B7A00655EFD /* Pin+CoreDataProperties.swift */,
 				41FB64EB1F16B050005EFC68 /* VirtualTourist */,
 				41FB64EA1F16B050005EFC68 /* Products */,
 				41BBD8681F180B100025A568 /* Frameworks */,
@@ -222,15 +219,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4181CB9D1F1E831800A14465 /* Photo+CoreDataProperties.swift in Sources */,
 				41FBD13E1F1B80CD000E53D2 /* Reachability.m in Sources */,
-				4181CB9C1F1E831800A14465 /* Photo+CoreDataClass.swift in Sources */,
-				4181CB9B1F1E831800A14465 /* Pin+CoreDataProperties.swift in Sources */,
+				4104FCD51F2A7B7A00655EFD /* Photo+CoreDataClass.swift in Sources */,
+				4104FCD71F2A7B7A00655EFD /* Pin+CoreDataClass.swift in Sources */,
+				4104FCD81F2A7B7A00655EFD /* Pin+CoreDataProperties.swift in Sources */,
 				41D0B0F31F1A73960074608D /* PhotoAlbumViewController.swift in Sources */,
-				4181CB9A1F1E831800A14465 /* Pin+CoreDataClass.swift in Sources */,
-				41D0B0E51F1A34DB0074608D /* CoreDataViewController.swift in Sources */,
 				41FB64ED1F16B050005EFC68 /* AppDelegate.swift in Sources */,
 				41BBD8641F17F1650025A568 /* CoreDataHandler.swift in Sources */,
+				4104FCD61F2A7B7A00655EFD /* Photo+CoreDataProperties.swift in Sources */,
 				41BBD85F1F17EE8D0025A568 /* Model.xcdatamodeld in Sources */,
 				41D0B0F61F1A74120074608D /* ConnectionHandler.swift in Sources */,
 				41FBD1411F1BB6D9000E53D2 /* PhotoCollectionViewCell.swift in Sources */,

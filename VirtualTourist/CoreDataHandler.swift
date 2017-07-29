@@ -14,8 +14,6 @@ struct CoreDataHandler{
     internal let coordinator: NSPersistentStoreCoordinator
     private let modelURL: URL
     internal let dbURL: URL
-    internal let persistingContext: NSManagedObjectContext
-    internal let backgroundContext: NSManagedObjectContext //MIGHT NOT USE
     let context: NSManagedObjectContext
     
     //Mark: Init
@@ -36,15 +34,9 @@ struct CoreDataHandler{
         
         coordinator = NSPersistentStoreCoordinator(managedObjectModel: model)
         
-        persistingContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-        persistingContext.persistentStoreCoordinator = coordinator
         
         context = NSManagedObjectContext(concurrencyType: .mainQueueConcurrencyType)
-        context.parent = persistingContext
-        
-        //NOT SURE GOING TO USE
-        backgroundContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-        backgroundContext.parent = context
+        context.persistentStoreCoordinator = coordinator
         
         let fm = FileManager.default
         
@@ -62,9 +54,6 @@ struct CoreDataHandler{
         }catch{
             print("Unable to save store as \(dbURL)")
         }
-        
-        
-        
     }
     
     func addStoreCoordinator(_ storeType: String, configuration: String?, storeURL: URL, options: [NSObject: AnyObject]?) throws{
@@ -83,28 +72,8 @@ internal extension CoreDataHandler{
     
 }
 
-extension CoreDataHandler{
-    
-    typealias Batch = (_ workerContext: NSManagedObjectContext) -> ()
-    
-    func performBackgroundBatchOperation(_ batch: @escaping Batch){
-        
-        backgroundContext.perform(){
-            batch(self.backgroundContext)
-            
-            do{
-                try self.backgroundContext.save()
-                print("Background Context saving")
-            }catch{
-                fatalError("Error while saving background context: \(error.localizedDescription) \(error)")
-            }
-        }
-        
-    }
-    
-}
 
-
+//Mark: save and delete functions
 extension CoreDataHandler{
     
     func save(){
@@ -113,19 +82,8 @@ extension CoreDataHandler{
                 do{
                     try self.context.save()
                     print("Saving complete")
-                    let request = NSFetchRequest<NSFetchRequestResult>(entityName: "Pin")
-                    let count = try? self.context.count(for: request)
-                    print(count!)
                 }catch{
                     fatalError("Error while saving main context: \(error)")
-                }
-                
-                self.persistingContext.perform(){
-                    do{
-                        try self.persistingContext.save()
-                    }catch{
-                        fatalError("Error while saving persisting context: \(error)")
-                    }
                 }
             }
         }
@@ -143,6 +101,21 @@ extension CoreDataHandler{
         DispatchQueue.main.asyncAfter(deadline: time){
             self.autosave(delayInSeconds)
         }
+    }
+    
+    func deletePhotos(photos: [Photo]){
+        
+        for photo in photos{
+            self.context.delete(photo)
+        }
+    }
+    
+    func deletePin(pins: [Pin]){
+        
+        for pin in pins{
+            self.context.delete(pin)
+        }
+        
     }
     
 }

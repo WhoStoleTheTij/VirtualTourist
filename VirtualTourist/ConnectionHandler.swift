@@ -19,8 +19,8 @@ class ConnectionHandler: NSObject{
         super.init()
     }
     
-    
-    func fetchImagesForLocation(longitude: String, latitude: String, pageNumber: Int ,completionHandler: @escaping (_ results: [AnyObject]?, _ error: String?) -> Void){
+    //Mark: fetch images based on the location provided with the longitude and latitude values
+    func fetchImagesForLocation(longitude: String, latitude: String, pageNumber: Int ,completionHandler: @escaping (_ results: [String:AnyObject]?, _ error: String?) -> Void){
         
         if self.isInternetAvailable(){
             let dict = [
@@ -77,18 +77,30 @@ class ConnectionHandler: NSObject{
                 let parsedResults: [String:AnyObject]!
                 do{
                     parsedResults = try JSONSerialization.jsonObject(with: data!, options: .allowFragments) as! [String:AnyObject]
+                    print(parsedResults)
                     
                     guard let photoArray = parsedResults["photos"] as? [String: AnyObject] else{
                         displayError("There are no photos for your location")
                         return
                     }
                     
+                    var returnDictionary = [String: AnyObject]()
+                    
+                    guard let pageCount = photoArray["pages"] else{
+                        displayError("There are no pages of images")
+                        return
+                    }
+                    
+                    returnDictionary["pageCount"] = pageCount
+                    
                     guard let photos = photoArray["photo"] as? [AnyObject] else{
                         displayError("Thera are no photos for your location")
                         return
                     }
                     
-                    completionHandler(photos, nil)
+                    returnDictionary["photos"] = photos as AnyObject
+                    
+                    completionHandler(returnDictionary, nil)
                     
                     
                 }catch{
@@ -103,12 +115,7 @@ class ConnectionHandler: NSObject{
         }else{
             completionHandler(nil, "There is no internet connection")
         }
-        
-        
-        
     }
-    
-    
     
     //Mark: check the internet is available
     func isInternetAvailable() -> Bool{

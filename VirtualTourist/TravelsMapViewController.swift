@@ -14,13 +14,15 @@ class TravelsMapViewController: UIViewController, MKMapViewDelegate {
 
     @IBOutlet weak var mapView: MKMapView!
     @IBOutlet weak var editPinsButton: UIBarButtonItem!
+    @IBOutlet weak var deletePinsButton: UIButton!
     
     var stack: CoreDataHandler! = nil
     var connectionHandler = ConnectionHandler()
     
-    var fetchedResultsController: NSFetchedResultsController<NSFetchRequestResult>?
+    var edittingPins: Bool = false
     
-    var currentPin: Pin!
+    var deletePins: [Pin] = []
+    var deleteAnnotations: [MKPointAnnotation] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -28,7 +30,7 @@ class TravelsMapViewController: UIViewController, MKMapViewDelegate {
         self.mapView.delegate = self
         
         let gestureRecogniser = UILongPressGestureRecognizer(target: self, action: #selector(longMapPress(gestureRecogniser:)))
-        gestureRecogniser.minimumPressDuration = 1.0
+        gestureRecogniser.minimumPressDuration = 0.2
         //gestureRecogniser.delegate = self as! UIGestureRecognizerDelegate
         self.mapView.addGestureRecognizer(gestureRecogniser)
         
@@ -36,7 +38,7 @@ class TravelsMapViewController: UIViewController, MKMapViewDelegate {
         stack = delegate.stack
         
         self.loadPins()
-        // Do any additional setup after loading the view.
+        
     }
     
     //Mark: load the pins to the map
@@ -64,44 +66,36 @@ class TravelsMapViewController: UIViewController, MKMapViewDelegate {
     }
 
     
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
-    }
-    */
-    
-    
-    //Mark: handle pin touch
+    ///Mark: handle pin touch
     func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
         let point = view.annotation as! MKPointAnnotation
-        
-        
-        //let pin = self.locatePin(latitude: point.coordinate.latitude, longitude: point.coordinate.longitude)
-        
-        if self.currentPin != nil {
-            let pin = self.currentPin
-            self.mapView.deselectAnnotation(point, animated: true)
-            
-            let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Photo")
-            fetchRequest.sortDescriptors = [NSSortDescriptor(key:"image", ascending:false)]
-            let predicate = NSPredicate(format: "pin == %@", argumentArray: [pin!])
-            fetchRequest.predicate = predicate
-            
-            let fc = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: self.stack.context, sectionNameKeyPath: nil, cacheName: nil)
-            
-            let photoController: PhotoAlbumViewController
-            photoController = self.storyboard?.instantiateViewController(withIdentifier: "PhotoAlbumViewController") as! PhotoAlbumViewController
-            photoController.fetchedResultsController = fc
-            
-            self.navigationController?.pushViewController(photoController, animated:true)
-            
+        let pin = self.locatePin(latitude: point.coordinate.latitude, longitude: point.coordinate.longitude, context: self.stack.context)
+        if !self.edittingPins{
+            //not deleting pins so change screen
+            if pin != nil {
+                self.mapView.deselectAnnotation(point, animated: true)
+                
+                let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Photo")
+                fetchRequest.sortDescriptors = [NSSortDescriptor(key:"image", ascending:false)]
+                let predicate = NSPredicate(format: "pin = %@", argumentArray: [pin!])
+                fetchRequest.predicate = predicate
+                
+                let photoController: PhotoAlbumViewController
+                photoController = self.storyboard?.instantiateViewController(withIdentifier: "PhotoAlbumViewController") as! PhotoAlbumViewController
+                photoController.pin = pin
+                
+                self.navigationController?.pushViewController(photoController, animated:true)
+                
+            }else{
+                self.mapView.deselectAnnotation(point, animated: true)
+                showUserErrorMessage(message: "Oop! Unable to find the correct pin")
+            }
         }else{
-            self.mapView.deselectAnnotation(point, animated: true)
-            showUserErrorMessage(message: "Oop! Unable to find the correct pin")
+            //deleting pins
+            if pin != nil{
+                self.deletePins.append(pin!)
+                self.deleteAnnotations.append(point)
+            }
         }
         
         
@@ -109,7 +103,7 @@ class TravelsMapViewController: UIViewController, MKMapViewDelegate {
     
     
     //Mark: find and return pin
-    func locatePin(latitude: CLLocationDegrees, longitude: CLLocationDegrees) -> Pin?{
+    func locatePin(latitude: CLLocationDegrees, longitude: CLLocationDegrees, context: NSManagedObjectContext) -> Pin?{
         
         let fr = NSFetchRequest<NSFetchRequestResult>(entityName: "Pin")
         fr.sortDescriptors = [NSSortDescriptor(key:"createdAt", ascending:false)]
@@ -121,18 +115,14 @@ class TravelsMapViewController: UIViewController, MKMapViewDelegate {
         
         fr.predicate = predicate
         
-        if let pins = try? stack.backgroundContext.fetch(fr) as? [Pin]{
+        if let pins = try? context.fetch(fr) as? [Pin]{
             let pin: Pin
-            print("PIN - \(pins?.count)")
             if (pins?.count)! > 0{
                 pin = (pins?[0])!
                 //The correct pin has been found and is returned
                 return pin
-                
             }
-            
         }
-        
         return nil
     }
     
@@ -148,60 +138,25 @@ class TravelsMapViewController: UIViewController, MKMapViewDelegate {
             //only create the pin if it is savable
             let annotation = MKPointAnnotation()
             annotation.coordinate = coord
-            
-            //try? self.stack.context.save()
-            
+            let _ = Pin(latitude: Double(coord.latitude), longitude: Double(coord.longitude), context: self.stack.context)
+            try? self.stack.context.save()
             self.mapView.addAnnotation(annotation)
-            print("Just created a pin")
-            DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + Double((Int64)(5 * NSEC_PER_SEC)) / Double(NSEC_PER_SEC)){
-                
-                self.connectionHandler.fetchImagesForLocation(longitude: String(coord.longitude), latitude: String(coord.latitude), pageNumber: 1,completionHandler: { (results, error) in
-                    
-                    self.stack.performBackgroundBatchOperation({ (workerContext) in
-                        let pin = Pin(latitude: Double(coord.latitude), longitude: Double(coord.longitude), context: workerContext)
-                        
-                        self.currentPin = pin
-                        //try? self.stack.backgroundContext.save()
-                        
-                        for photo in results!{
-                            print(photo)
-                            if let urlString = photo["url_m"]{
-                                
-                                let url = URL(string: urlString as! String)
-                                if let data = try? Data(contentsOf: url!){
-                                    let image = UIImage(data: data)
-                                    
-                                    let p = Photo(image:(UIImageJPEGRepresentation(image!, 1) as NSData?)!, context: workerContext)
-                                    pin.photos?.adding(p)
-                                    p.pin = pin
-                                    print("PIN -- \(pin.photos?.count)")
-                                }
-                                
-                                
-                                
-                            }
-                            
-                        }
-                    })
-                    
-                    
-                })
-                
-                
-            }
-            try? stack.context.save()
         }
-        
-        
-        
-        
     }
     
     //Mark: enable/disable the deletion of pins
     @IBAction func editPinsAction(_ sender: Any) {
+        let button = sender as! UIBarButtonItem
+        if !edittingPins {
+            button.title = "Done"
+            self.edittingPins = true
+            self.deletePinsButton.isEnabled = true
+        }else{
+            button.title = "Edit"
+            self.edittingPins = false
+            self.deletePinsButton.isEnabled = false
+        }
     }
-    
-
     
     //Mark: display an error message to the user
     func showUserErrorMessage(message:String){
@@ -211,8 +166,12 @@ class TravelsMapViewController: UIViewController, MKMapViewDelegate {
         self.present(alert, animated:true, completion:nil)
     }
     
-    
-    
+    //Mark: delete the selected pins from the map and remove from storage
+    @IBAction func deletePinAction(_ sender: Any) {
+        self.mapView.removeAnnotations(self.deleteAnnotations)
+        self.stack.deletePin(pins: self.deletePins)
+        self.stack.save()
+    }
     
 }
 
