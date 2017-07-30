@@ -93,30 +93,36 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
         if !deletingPhotos{
             self.connectionHandler.fetchImagesForLocation(longitude: String(self.pin.longitude), latitude: String(self.pin.latitude), pageNumber: pageNum,completionHandler: { (results, error) in
                 
-                //set the total page count to allow for random selection later
-                let pageCount = results?["pageCount"]
-                self.pin.pageCount = pageCount as! Int16
-                
-                let photos = results?["photos"] as! [AnyObject]
-                
-                for photo in photos{
-                    if let urlString = photo["url_m"]{
-                        
-                        let url = URL(string: urlString as! String)
-                        if let data = try? Data(contentsOf: url!){
-                            let image = UIImage(data: data)
-                            //
-                            let photoItem = Photo(image:(UIImageJPEGRepresentation(image!, 1) as NSData?)!, url:urlString as! String, context: self.stack.context)
-                            self.pin.photos?.adding(photoItem)
-                            photoItem.pin = self.pin
-                            self.imageCollection = self.pin.photos?.allObjects as! [Photo]
+                if error == nil{
+                    //set the total page count to allow for random selection later
+                    let pageCount = results?["pageCount"]
+                    self.pin.pageCount = pageCount as! Int16
+                    
+                    let photos = results?["photos"] as! [AnyObject]
+                    
+                    for photo in photos{
+                        if let urlString = photo["url_m"]{
                             
-                            DispatchQueue.main.async {
-                                self.collectionView.reloadData()
+                            let url = URL(string: urlString as! String)
+                            if let data = try? Data(contentsOf: url!){
+                                let image = UIImage(data: data)
+                                //
+                                let photoItem = Photo(image:(UIImageJPEGRepresentation(image!, 1) as NSData?)!, url:urlString as! String, context: self.stack.context)
+                                self.pin.photos?.adding(photoItem)
+                                photoItem.pin = self.pin
+                                self.imageCollection = self.pin.photos?.allObjects as! [Photo]
+                                
+                                DispatchQueue.main.async {
+                                    self.collectionView.reloadData()
+                                }
                             }
                         }
                     }
+                }else{
+                    self.showUserErrorMessage(message: error!)
                 }
+                
+                
             })
         }
     }
@@ -207,6 +213,14 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
             self.imageCollection.remove(at: index.row)
             self.collectionView.deleteItems(at: [index])
         }
+    }
+    
+    //Mark: display an error message to the user
+    func showUserErrorMessage(message:String){
+        let alert = UIAlertController(title:"Error", message:message, preferredStyle: .alert)
+        let okAction = UIAlertAction(title:"OK", style: .default)
+        alert.addAction(okAction)
+        self.present(alert, animated:true, completion:nil)
     }
     
 }
