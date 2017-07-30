@@ -2,7 +2,7 @@
 //  Pin+CoreDataProperties.swift
 //  VirtualTourist
 //
-//  Created by Richard H on 27/07/2017.
+//  Created by Richard H on 30/07/2017.
 //  Copyright © 2017 Richard H. All rights reserved.
 //
 

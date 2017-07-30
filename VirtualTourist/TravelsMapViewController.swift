@@ -18,6 +18,7 @@ class TravelsMapViewController: UIViewController, MKMapViewDelegate {
     
     var stack: CoreDataHandler! = nil
     var connectionHandler = ConnectionHandler()
+    var messageHelper = MessageHelper()
     
     var edittingPins: Bool = false
     
@@ -88,7 +89,7 @@ class TravelsMapViewController: UIViewController, MKMapViewDelegate {
                 
             }else{
                 self.mapView.deselectAnnotation(point, animated: true)
-                showUserErrorMessage(message: "Oop! Unable to find the correct pin")
+                self.messageHelper.showUserErrorMessage(message: "Oop! Unable to find the correct pin", view: self)
             }
         }else{
             //deleting pins
@@ -138,7 +139,36 @@ class TravelsMapViewController: UIViewController, MKMapViewDelegate {
             //only create the pin if it is savable
             let annotation = MKPointAnnotation()
             annotation.coordinate = coord
-            let _ = Pin(latitude: Double(coord.latitude), longitude: Double(coord.longitude), context: self.stack.context)
+            let pin = Pin(latitude: Double(coord.latitude), longitude: Double(coord.longitude), context: self.stack.context)
+            
+            self.connectionHandler.fetchImagesForLocation(longitude: String(pin.longitude), latitude: String(pin.latitude), pageNumber: 1,completionHandler: { (results, error) in
+                
+                if error == nil{
+                    //set the total page count to allow for random selection later
+                    let pageCount = results?["pageCount"]
+                    DispatchQueue.main.async {
+                        pin.pageCount = pageCount as! Int16
+                    }
+                    
+                    
+                    let photos = results?["photos"] as! [AnyObject]
+                    
+                    for photo in photos{
+                        if let urlString = photo["url_m"]{
+                            DispatchQueue.main.async {
+                                let photoItem = Photo(url:urlString as! String, context: self.stack.context)
+                                pin.photos?.adding(photoItem)
+                                photoItem.pin = pin
+                            }
+                            
+                        }
+                    }
+                }else{
+                    self.messageHelper.showUserErrorMessage(message: error!, view: self)
+                }
+                
+                
+            })
             try? self.stack.context.save()
             self.mapView.addAnnotation(annotation)
         }
@@ -158,13 +188,6 @@ class TravelsMapViewController: UIViewController, MKMapViewDelegate {
         }
     }
     
-    //Mark: display an error message to the user
-    func showUserErrorMessage(message:String){
-        let alert = UIAlertController(title:"Error", message:message, preferredStyle: .alert)
-        let okAction = UIAlertAction(title:"OK", style: .default)
-        alert.addAction(okAction)
-        self.present(alert, animated:true, completion:nil)
-    }
     
     //Mark: delete the selected pins from the map and remove from storage
     @IBAction func deletePinAction(_ sender: Any) {

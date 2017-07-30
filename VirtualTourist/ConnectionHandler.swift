@@ -131,4 +131,46 @@ class ConnectionHandler: NSObject{
         return appDelegate.hasInternetConnection()
     }
     
+    //Mark: fetch image data
+    func fetchImageData(urlString: String, completionHandler: @escaping (_ returnImageData: Data?, _ error: String?) -> Void){
+    
+        if self.isInternetAvailable(){
+            let request = URLRequest(url: URL(string:urlString)!)
+            
+            let task = URLSession.shared.dataTask(with:request as URLRequest) { data, response, error in
+                
+                func displayError(_ errorString: String){
+                    print(errorString)
+                    completionHandler(nil, errorString)
+                }
+                
+                guard (error == nil) else{
+                    displayError("Failed to fetch images from Flickr")
+                    return
+                }
+                
+                guard let statusCode = (response as? HTTPURLResponse)?.statusCode, statusCode >= 200 && statusCode <= 299 else{
+                    displayError("The status code was outside the accepted 2xx range")
+                    return
+                }
+                
+                guard data != nil else{
+                    displayError("The response returned no data")
+                    return
+                }
+                
+                completionHandler(data, nil)
+                
+            }
+            
+            task.resume()
+        }else{
+            completionHandler(nil, "No Internet")
+        }
+        
+        
+    }
+    
+    
+    
 }

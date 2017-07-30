@@ -14,6 +14,7 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
 
     var pin: Pin!
     var connectionHandler = ConnectionHandler()
+    var messageHelper = MessageHelper()
     @IBOutlet weak var flowLayout: UICollectionViewFlowLayout!
     
     @IBOutlet weak var collectionDeleteButton: UIButton!
@@ -25,8 +26,6 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
     var stack: CoreDataHandler! = nil
     
     var maximumPhotoCount: Int = 21
-    
-    var imageCollection:[Photo] = []
     
     var photosToDelete: [Int] = []
     var deletingPhotos: Bool = false
@@ -59,28 +58,22 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
         self.collectionView.delegate = self
         self.collectionView.dataSource = self
         
-        if self.pin.photos?.count == 0{
-            self.loadImages(pageNum: 1)
-        }else{
-            self.imageCollection = self.pin.photos?.allObjects as! [Photo]
-        }
-        
     }
 
     
     //Mark: loop the collection of memes and display in the collection view
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! PhotoCollectionViewCell
+        
+        cell.activityView.startAnimating()
+        cell.activityView.isHidden = false
+        
         var photo: Photo? = nil
         
-        if self.imageCollection.count > 0 && self.imageCollection.indices.contains(indexPath.row){
-            photo = self.imageCollection[indexPath.row]
+        if (self.pin.photos?.allObjects.indices.contains(indexPath.row))!{
+            photo = self.pin.photos?.allObjects[indexPath.row] as? Photo
         }
         
-        if indexPath.row <= self.imageCollection.count && !deletingPhotos{
-            cell.activityView.startAnimating()
-            cell.isHidden = false
-        }
         cell.setupCell(photo: photo)
         
         return cell
@@ -96,30 +89,32 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
                 if error == nil{
                     //set the total page count to allow for random selection later
                     let pageCount = results?["pageCount"]
-                    self.pin.pageCount = pageCount as! Int16
+                    DispatchQueue.main.async {
+                        if self.pin.pageCount == 0{
+                           self.pin.pageCount = pageCount as! Int16
+                        }
+                    }
+                    
+                    
                     
                     let photos = results?["photos"] as! [AnyObject]
                     
                     for photo in photos{
                         if let urlString = photo["url_m"]{
-                            
-                            let url = URL(string: urlString as! String)
-                            if let data = try? Data(contentsOf: url!){
-                                let image = UIImage(data: data)
-                                //
-                                let photoItem = Photo(image:(UIImageJPEGRepresentation(image!, 1) as NSData?)!, url:urlString as! String, context: self.stack.context)
+                            DispatchQueue.main.async {
+                                let photoItem = Photo(url:urlString as! String, context: self.stack.context)
                                 self.pin.photos?.adding(photoItem)
                                 photoItem.pin = self.pin
-                                self.imageCollection = self.pin.photos?.allObjects as! [Photo]
-                                
-                                DispatchQueue.main.async {
-                                    self.collectionView.reloadData()
-                                }
                             }
+                            
                         }
                     }
+                    
+                    DispatchQueue.main.async {
+                        self.collectionView.reloadData()
+                    }
                 }else{
-                    self.showUserErrorMessage(message: error!)
+                    self.messageHelper.showUserErrorMessage(message: error!, view: self)
                 }
                 
                 
@@ -138,11 +133,7 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
     
     //Mark: set the number of items for the collectun view
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        var returnValue = maximumPhotoCount
-        if self.pin.photos?.count != 0{
-            returnValue = (self.pin.photos?.count)!
-        }
-        return returnValue
+        return maximumPhotoCount
     }
     
     
@@ -207,20 +198,14 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
     //Mark: delete the selected cells
     @IBAction func deletePhotoAction(_ sender: Any) {
         while let index = self.collectionView.indexPathsForSelectedItems!.first{
-            let photo = self.imageCollection[index.row]
+            let photo = self.pin.photos?.allObjects[index.row] as! Photo
             self.stack.deletePhotos(photos: [photo])
             self.stack.save()
-            self.imageCollection.remove(at: index.row)
+            
             self.collectionView.deleteItems(at: [index])
         }
     }
     
-    //Mark: display an error message to the user
-    func showUserErrorMessage(message:String){
-        let alert = UIAlertController(title:"Error", message:message, preferredStyle: .alert)
-        let okAction = UIAlertAction(title:"OK", style: .default)
-        alert.addAction(okAction)
-        self.present(alert, animated:true, completion:nil)
-    }
+    
     
 }
