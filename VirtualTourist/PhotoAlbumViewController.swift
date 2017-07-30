@@ -133,7 +133,12 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
     
     //Mark: set the number of items for the collectun view
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return maximumPhotoCount
+        if self.pin.photos?.count == 0{
+            return maximumPhotoCount
+        }else{
+            return (self.pin.photos?.count)!
+        }
+        
     }
     
     
@@ -178,20 +183,18 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
     //Mark: generate a new list of images
     @IBAction func newCollectionAction(_ sender: Any) {
         
-        var pageCount = self.pin.pageCount
-        if pageCount == 0{
-            pageCount = 1
-        }
-        let photos = self.pin.photos?.allObjects as! [Photo]
+        let pageCount = 4000/21
         
+        let pageNum = arc4random_uniform(UInt32(pageCount))
+        
+        let photos = self.pin.photos?.allObjects as! [Photo]
         self.stack.deletePhotos(photos: photos)
-        var pageNum: Int
-        if pageCount == 0{
-            pageNum = 1
-        }else{
-            pageNum = Int(arc4random_uniform(UInt32(pageCount)))
+        for photo in photos{
+            self.pin.removeFromPhotos(photo)
         }
-        self.loadImages(pageNum: pageNum)
+        
+        
+        self.loadImages(pageNum: Int(pageNum))
 
     }
 
@@ -199,6 +202,9 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
     @IBAction func deletePhotoAction(_ sender: Any) {
         while let index = self.collectionView.indexPathsForSelectedItems!.first{
             let photo = self.pin.photos?.allObjects[index.row] as! Photo
+            
+            self.pin.removeFromPhotos(photo)
+            
             self.stack.deletePhotos(photos: [photo])
             self.stack.save()
             
